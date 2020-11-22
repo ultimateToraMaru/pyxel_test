@@ -204,6 +204,5 @@ class App:
         
     def draw_gameover(self):
         pyxel.text(75, 0, "game over!", 5)
-
-        
+  
 App()
