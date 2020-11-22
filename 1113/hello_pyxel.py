@@ -1,7 +1,7 @@
 import pyxel
 from collections import deque, namedtuple
 from random import randint
-from enum import Enum, auto
+from enum import Enum, auto                 # enumを使ってゲームシーンを管理
 
 Point = namedtuple("Point", ["w", "h"])     # 猫の向き
 
