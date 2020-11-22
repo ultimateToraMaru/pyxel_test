@@ -10,11 +10,17 @@ DOWN = Point(16, 16)
 RIGHT = Point(-16, 16)
 LEFT = Point(16, 16)
 
+class GAMESCENE(Enum):
+    # 画面のシーンをEnumで定義する
+    Title = auto()
+    Main = auto()
+    GameOver = auto()
 
 class App:
     music_flug = False
     def __init__(self):
         pyxel.init(160, 120, caption="Hello Pyxel!")
+        self.game_scene = GAMESCENE.Title
         pyxel.load("test.pyxres")   # player(48, 16), food(48, 0)
         self.direction = RIGHT
 
@@ -33,22 +39,8 @@ class App:
         
 
     def update(self):
-        if pyxel.btnp(pyxel.KEY_Q):
-            pyxel.quit()
-        self.update_player
+        self.scene_load()
 
-        for i, v in enumerate(self.food):
-            self.food[i] = self.update_food(*v)
-
-        for i, v in enumerate(self.enemy):
-            self.enemy[i] = self.update_enemy(*v)
-
-        self.update_player()
-        
-        # bgm
-        if self.music_flug == False:
-            pyxel.playm(0, loop=True)
-            self.music_flug = True
 
     def update_player(self):
         if pyxel.btn(pyxel.KEY_LEFT):
@@ -70,40 +62,18 @@ class App:
 
     def draw(self):
         # bg color
-        #pyxel.cls(6)
+        # pyxel.cls(6)
 
-        # tile map
-        pyxel.bltm(0, 0, 0, 0, 0, 20, 15, 0)
+        pyxel.cls(0) # 一旦画面を真っ新にしています。前書いていた映像が残ってしまうので
+        if self.game_scene == GAMESCENE.Title:
+            self.draw_title()
 
-        # draw food
-        for x, y, is_active in self.food:
-            if is_active:
-                pyxel.blt(x, y, 0, 48, 0, 16, 16, 0)
+        elif self.game_scene == GAMESCENE.Main:
+            self.draw_main()
 
-        # draw enemy
-        for x, y, is_active in self.enemy:
-            if is_active:
-                pyxel.blt(x, y, 0, 48, 32, -16, 16, 0)
+        elif self.game_scene == GAMESCENE.GameOver:
+            self.draw_gameover()
 
-        # draw cat
-        pyxel.blt(
-            self.player_x, 
-            self.player_y, 
-            0, 
-            48 if self.player_vy > 48 else 48, 
-            16, 
-            self.direction[0], 
-            self.direction[1], 
-            0
-        )
-
-        # print score
-        s = "Score {:>4}".format(self.score)
-        pyxel.text(5, 4, s, 1)
-        pyxel.text(4, 4, s, 7)
-
-        # draw hart
-        self.draw_harts()
         
 
     def update_food(self, x, y, is_active):
@@ -159,5 +129,81 @@ class App:
             dhart = 0
 
         pyxel.blt(80, 0, 0, 48, 96, dhart, 16, 0)
+
+    def scene_load(self):
+        if self.game_scene == GAMESCENE.Title:
+            self.update_title()
+        elif self.game_scene == GAMESCENE.Main:
+            self.update_main()
+        elif self.game_scene == GAMESCENE.GameOver:
+            self.update_gameover()
+    
+    def update_title(self):
+        if pyxel.btnp(pyxel.KEY_SPACE):
+            self.game_scene = GAMESCENE.Main
+    
+    def update_main(self):
+        if self.harts == 0:
+            self.game_scene = GAMESCENE.GameOver
+
+        self.update_player
+
+        for i, v in enumerate(self.food):
+            self.food[i] = self.update_food(*v)
+
+        for i, v in enumerate(self.enemy):
+            self.enemy[i] = self.update_enemy(*v)
+
+        self.update_player()
+        
+        # bgm
+        if self.music_flug == False:
+            pyxel.playm(0, loop=True)
+            self.music_flug = True
+    
+    def update_gameover(self):
+        if pyxel.btnp(pyxel.KEY_SPACE):
+            self.game_scene = GAMESCENE.Title
+
+    def draw_title(self):
+        pyxel.text(75, 0, "cacapon RPG!", 5)
+
+    def draw_main(self):
+        # tile map
+        pyxel.bltm(0, 0, 0, 0, 0, 20, 15, 0)
+
+        # draw food
+        for x, y, is_active in self.food:
+            if is_active:
+                pyxel.blt(x, y, 0, 48, 0, 16, 16, 0)
+
+        # draw enemy
+        for x, y, is_active in self.enemy:
+            if is_active:
+                pyxel.blt(x, y, 0, 48, 32, -16, 16, 0)
+
+        # draw cat
+        pyxel.blt(
+            self.player_x, 
+            self.player_y, 
+            0, 
+            48 if self.player_vy > 48 else 48, 
+            16, 
+            self.direction[0], 
+            self.direction[1], 
+            0
+        )
+
+        # print score
+        s = "Score {:>4}".format(self.score)
+        pyxel.text(5, 4, s, 1)
+        pyxel.text(4, 4, s, 7)
+
+        # draw hart
+        self.draw_harts()
+        
+    def draw_gameover(self):
+        pyxel.text(75, 0, "game over!", 5)
+
         
 App()
