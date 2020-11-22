@@ -1,6 +1,7 @@
 import pyxel
 from collections import deque, namedtuple
 from random import randint
+from enum import Enum, auto
 
 Point = namedtuple("Point", ["w", "h"])     # 猫の向き
 
