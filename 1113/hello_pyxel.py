@@ -163,7 +163,7 @@ class App:
     
     def update_gameover(self):
         if pyxel.btnp(pyxel.KEY_SPACE):
-            self.game_scene = GAMESCENE.Title
+            pyxel.quit()
 
     def draw_title(self):
         pyxel.text(75, 0, "cacapon RPG!", 5)
