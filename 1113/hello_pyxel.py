@@ -19,7 +19,7 @@ class GAMESCENE(Enum):
 class App:
     music_flug = False
     def __init__(self):
-        pyxel.init(160, 120, caption="Hello Pyxel!")
+        pyxel.init(160, 120, caption="Hello Pyxel!")    # pixel(160, 120) tilemap(20, 15)
         self.game_scene = GAMESCENE.Title
         pyxel.load("test.pyxres")   # player(48, 16), food(48, 0)
         self.direction = RIGHT
@@ -64,7 +64,7 @@ class App:
         # bg color
         # pyxel.cls(6)
 
-        pyxel.cls(0) # 一旦画面を真っ新にしています。前書いていた映像が残ってしまうので
+        pyxel.cls(0) # 一旦画面を真っ新にする
         if self.game_scene == GAMESCENE.Title:
             self.draw_title()
 
@@ -166,7 +166,8 @@ class App:
             pyxel.quit()
 
     def draw_title(self):
-        pyxel.text(75, 0, "cacapon RPG!", 5)
+        pyxel.text(44, 100, "Press Space Key !", 13)
+        pyxel.blt(0, 32, 1, 0, 0, 160, 32, 2)
 
     def draw_main(self):
         # tile map
