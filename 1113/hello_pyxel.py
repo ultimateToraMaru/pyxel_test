@@ -35,6 +35,9 @@ class App:
         self.food = [(i * 60, randint(0, 104), True) for i in range(4)]
         self.enemy = [(i * 60, randint(0, 104), True) for i in range(4)]
 
+        self.logo_x = 0
+        self.logo_y = -32
+
         pyxel.run(self.update, self.draw)
         
 
@@ -59,6 +62,7 @@ class App:
             if self.player_y != 104:
                 self.player_y = min(self.player_y + 2, pyxel.width - 16)
                 self.direction = DOWN
+
 
     def draw(self):
         # bg color
@@ -95,6 +99,7 @@ class App:
 
         return (x, y, is_active)
 
+
     def update_enemy(self, x, y, is_active):
         if is_active and abs(x - self.player_x) < 12 and abs(y - self.player_y) < 12:   # abs関数は絶対値を返す
             is_active = False
@@ -114,6 +119,7 @@ class App:
 
         return (x, y, is_active)
     
+
     def draw_harts(self):
         if self.harts == 5:
             dhart = 80
@@ -130,6 +136,7 @@ class App:
 
         pyxel.blt(80, 0, 0, 48, 96, dhart, 16, 0)
 
+
     def scene_load(self):
         if self.game_scene == GAMESCENE.Title:
             self.update_title()
@@ -138,10 +145,12 @@ class App:
         elif self.game_scene == GAMESCENE.GameOver:
             self.update_gameover()
     
+
     def update_title(self):
         if pyxel.btnp(pyxel.KEY_SPACE):
             self.game_scene = GAMESCENE.Main
     
+
     def update_main(self):
         if self.harts == 0:
             self.game_scene = GAMESCENE.GameOver
@@ -161,13 +170,18 @@ class App:
             pyxel.playm(0, loop=True)
             self.music_flug = True
     
+
     def update_gameover(self):
         if pyxel.btnp(pyxel.KEY_SPACE):
             pyxel.quit()
 
+
     def draw_title(self):
         pyxel.text(44, 100, "Press Space Key !", 13)
-        pyxel.blt(0, 32, 1, 0, 0, 160, 32, 2)
+        pyxel.blt(self.logo_x, self.logo_y, 1, 0, 0, 160, 32, 2)
+        if(self.logo_y < 32):
+            self.update_logo()
+
 
     def draw_main(self):
         # tile map
@@ -205,5 +219,10 @@ class App:
         
     def draw_gameover(self):
         pyxel.text(75, 0, "game over!", 5)
+    
+
+    def update_logo(self):
+        self.logo_x = 0
+        self.logo_y += 1
   
 App()
