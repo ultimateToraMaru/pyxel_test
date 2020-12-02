@@ -34,6 +34,7 @@ class App:
         self.player_vy = 0
         self.food = [(i * 60, randint(0, 104), True) for i in range(4)]
         self.enemy = [(i * 60, randint(0, 104), True) for i in range(4)]
+        self.enemy2 = [(i * 60, randint(0, 104), False) for i in range(4)]
 
         self.logo_x = 0
         self.logo_y = -32
@@ -42,7 +43,12 @@ class App:
         
 
     def update(self):
-        self.scene_load()
+        if self.game_scene == GAMESCENE.Title:
+            self.update_title()
+        elif self.game_scene == GAMESCENE.Main:
+            self.update_main()
+        elif self.game_scene == GAMESCENE.GameOver:
+            self.update_gameover()
 
 
     def update_player(self):
@@ -118,6 +124,26 @@ class App:
             is_active = True
 
         return (x, y, is_active)
+
+
+    def update_enemy2(self, x, y, is_active):
+        if is_active and abs(x - self.player_x) < 12 and abs(y - self.player_y) < 12:   # abs関数は絶対値を返す
+            is_active = False
+            self.player_vy = min(self.player_vy, -8)
+            pyxel.play(3, 4)
+            self.harts -= 1
+
+            # se
+            pyxel.play(2, 11, loop=False)
+
+        y += 1
+
+        if y > 200:
+            x = randint(0, 104)
+            y = 0
+            is_active = True
+
+        return (x, y, is_active)
     
 
     def draw_harts(self):
@@ -135,15 +161,6 @@ class App:
             dhart = 0
 
         pyxel.blt(80, 0, 0, 48, 96, dhart, 16, 0)
-
-
-    def scene_load(self):
-        if self.game_scene == GAMESCENE.Title:
-            self.update_title()
-        elif self.game_scene == GAMESCENE.Main:
-            self.update_main()
-        elif self.game_scene == GAMESCENE.GameOver:
-            self.update_gameover()
     
 
     def update_title(self):
@@ -163,11 +180,15 @@ class App:
         for i, v in enumerate(self.enemy):
             self.enemy[i] = self.update_enemy(*v)
 
+        if(self.score > 2000):
+            for i, v in enumerate(self.enemy2):
+                self.enemy2[i] = self.update_enemy2(*v)
+
         self.update_player()
         
         # bgm
         if self.music_flug == False:
-            pyxel.playm(0, loop=True)
+            #pyxel.playm(0, loop=True)
             self.music_flug = True
     
 
@@ -177,7 +198,8 @@ class App:
 
 
     def draw_title(self):
-        pyxel.text(44, 100, "Press Space Key !", 13)
+        pyxel.cls(6)
+        pyxel.text(44, 100, "Press Space Key !", 0)
         pyxel.blt(self.logo_x, self.logo_y, 1, 0, 0, 160, 32, 2)
         if(self.logo_y < 32):
             self.update_logo()
@@ -196,6 +218,11 @@ class App:
         for x, y, is_active in self.enemy:
             if is_active:
                 pyxel.blt(x, y, 0, 48, 32, -16, 16, 0)
+
+        # draw enemy2
+        for x, y, is_active in self.enemy2:
+            if is_active:
+                pyxel.blt(x, y, 0, 48, 64, 16, 16, 0)
 
         # draw cat
         pyxel.blt(
@@ -223,6 +250,6 @@ class App:
 
     def update_logo(self):
         self.logo_x = 0
-        self.logo_y += 1
-  
+        self.logo_y += 0.5
+
 App()
