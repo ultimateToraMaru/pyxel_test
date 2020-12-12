@@ -1,4 +1,5 @@
 import pyxel
+import time
 from collections import deque, namedtuple
 from random import randint
 from enum import Enum, auto                 # enumを使ってゲームシーンを管理
@@ -17,7 +18,8 @@ class GAMESCENE(Enum):
     GameOver = auto()
 
 class App:
-    music_flug = False
+    music_flag = False
+    item_sw = False
     def __init__(self):
         pyxel.init(160, 120, caption="Hello Pyxel!")    # pixel(160, 120) tilemap(20, 15)
         self.game_scene = GAMESCENE.Title
@@ -35,9 +37,12 @@ class App:
         self.food = [(i * 60, randint(0, 104), True) for i in range(4)]
         self.enemy = [(i * 60, randint(0, 104), True) for i in range(4)]
         self.enemy2 = [(i * 60, randint(0, 104), False) for i in range(4)]
+        self.item = [(i * 60, randint(0, 104), False) for i in range(1)]
 
         self.logo_x = 0
         self.logo_y = -32
+
+        self.start = 0
 
         pyxel.run(self.update, self.draw)
         
@@ -111,10 +116,17 @@ class App:
             is_active = False
             self.player_vy = min(self.player_vy, -8)
             pyxel.play(3, 4)
-            self.harts -= 1
 
-            # se
-            pyxel.play(2, 11, loop=False)
+            if(self.item_sw == False):
+                self.harts -= 1
+                pyxel.play(2, 11, loop=False)
+                
+            else:
+                self.score += 200
+                pyxel.play(2, 10, loop=False)
+                if(time.time() > self.start + 5):
+                    self.item_sw = False
+
 
         x += 2
 
@@ -139,6 +151,28 @@ class App:
         y += 1
 
         if y > 200:
+            x = randint(0, 104)
+            y = 0
+            is_active = True
+
+        return (x, y, is_active)
+
+
+    def update_item(self, x, y, is_active):
+        if is_active and abs(x - self.player_x) < 12 and abs(y - self.player_y) < 12:   # abs関数は絶対値を返す
+            is_active = False
+            self.score += 300
+            self.player_vy = min(self.player_vy, -8)
+            pyxel.play(3, 4)
+            self.item_sw = True
+            self.start = time.time()
+
+            # se
+            pyxel.play(2, 12, loop=False)
+
+        y += 3
+
+        if y > 1000:
             x = randint(0, 104)
             y = 0
             is_active = True
@@ -184,12 +218,15 @@ class App:
             for i, v in enumerate(self.enemy2):
                 self.enemy2[i] = self.update_enemy2(*v)
 
+        for i, v in enumerate(self.item):
+            self.item[i] = self.update_item(*v)
+
         self.update_player()
         
         # bgm
-        if self.music_flug == False:
+        if self.music_flag == False:
             #pyxel.playm(0, loop=True)
-            self.music_flug = True
+            self.music_flag = True
     
 
     def update_gameover(self):
@@ -217,12 +254,20 @@ class App:
         # draw enemy
         for x, y, is_active in self.enemy:
             if is_active:
-                pyxel.blt(x, y, 0, 48, 32, -16, 16, 0)
+                if(self.item_sw == False):
+                    pyxel.blt(x, y, 0, 48, 32, -16, 16, 0)
+                else:
+                    pyxel.blt(x, y, 0, 64, 32, -16, 16, 0)
 
         # draw enemy2
         for x, y, is_active in self.enemy2:
             if is_active:
                 pyxel.blt(x, y, 0, 48, 64, 16, 16, 0)
+
+        # draw item
+        for x, y, is_active in self.item:
+            if is_active:
+                pyxel.blt(x, y, 0, 64, 0, 16, 16, 0)
 
         # draw cat
         pyxel.blt(
