@@ -46,7 +46,6 @@ class App:
 
         pyxel.run(self.update, self.draw)
         
-
     def update(self):
         if self.game_scene == GAMESCENE.Title:
             self.update_title()
@@ -54,7 +53,6 @@ class App:
             self.update_main()
         elif self.game_scene == GAMESCENE.GameOver:
             self.update_gameover()
-
 
     def update_player(self):
         if pyxel.btn(pyxel.KEY_LEFT):
@@ -74,7 +72,6 @@ class App:
                 self.player_y = min(self.player_y + 2, pyxel.width - 16)
                 self.direction = DOWN
 
-
     def draw(self):
         # bg color
         # pyxel.cls(6)
@@ -88,8 +85,6 @@ class App:
 
         elif self.game_scene == GAMESCENE.GameOver:
             self.draw_gameover()
-
-        
 
     def update_food(self, x, y, is_active):
         if is_active and abs(x - self.player_x) < 12 and abs(y - self.player_y) < 12:   # abs関数は絶対値を返す
@@ -110,7 +105,6 @@ class App:
 
         return (x, y, is_active)
 
-
     def update_enemy(self, x, y, is_active):
         if is_active and abs(x - self.player_x) < 12 and abs(y - self.player_y) < 12:   # abs関数は絶対値を返す
             is_active = False
@@ -127,7 +121,6 @@ class App:
                 if(time.time() > self.start + 5):
                     self.item_sw = False
 
-
         x += 2
 
         if x > 160:
@@ -136,7 +129,6 @@ class App:
             is_active = True
 
         return (x, y, is_active)
-
 
     def update_enemy2(self, x, y, is_active):
         if is_active and abs(x - self.player_x) < 12 and abs(y - self.player_y) < 12:   # abs関数は絶対値を返す
@@ -157,7 +149,6 @@ class App:
 
         return (x, y, is_active)
 
-
     def update_item(self, x, y, is_active):
         if is_active and abs(x - self.player_x) < 12 and abs(y - self.player_y) < 12:   # abs関数は絶対値を返す
             is_active = False
@@ -166,11 +157,17 @@ class App:
             pyxel.play(3, 4)
             self.item_sw = True
             self.start = time.time()
+            self.harts += 1
+            # bgm
+            pyxel.stop(0)
+            pyxel.play(0, 2, loop=True)
+
+            self.music_flag = False
 
             # se
             pyxel.play(2, 12, loop=False)
 
-        y += 3
+        y += 2
 
         if y > 1000:
             x = randint(0, 104)
@@ -179,7 +176,6 @@ class App:
 
         return (x, y, is_active)
     
-
     def draw_harts(self):
         if self.harts == 5:
             dhart = 80
@@ -196,11 +192,9 @@ class App:
 
         pyxel.blt(80, 0, 0, 48, 96, dhart, 16, 0)
     
-
     def update_title(self):
         if pyxel.btnp(pyxel.KEY_SPACE):
             self.game_scene = GAMESCENE.Main
-    
 
     def update_main(self):
         if self.harts == 0:
@@ -224,15 +218,26 @@ class App:
         self.update_player()
         
         # bgm
-        if self.music_flag == False:
-            #pyxel.playm(0, loop=True)
+        if (self.music_flag == False and self.item_sw == False):
+            pyxel.stop(0)
+            pyxel.playm(0, loop=True)
             self.music_flag = True
-    
+
+        # if (self.item_sw == True):
+
+
+        # elif (self.item_sw == False):
+        #     pyxel.stop(0)
+        #     pyxel.playm(0, loop=True)
+        
+        # print('music_flag: ' ,)
+        # print(self.music_flag)
+        # print('item_flag: ' ,)
+        # print(self.item_sw)
 
     def update_gameover(self):
         if pyxel.btnp(pyxel.KEY_SPACE):
             pyxel.quit()
-
 
     def draw_title(self):
         pyxel.cls(6)
@@ -240,7 +245,6 @@ class App:
         pyxel.blt(self.logo_x, self.logo_y, 1, 0, 0, 160, 32, 2)
         if(self.logo_y < 32):
             self.update_logo()
-
 
     def draw_main(self):
         # tile map
@@ -292,7 +296,6 @@ class App:
     def draw_gameover(self):
         pyxel.text(75, 0, "game over!", 5)
     
-
     def update_logo(self):
         self.logo_x = 0
         self.logo_y += 0.5
