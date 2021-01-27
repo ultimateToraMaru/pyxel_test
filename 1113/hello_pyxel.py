@@ -43,6 +43,7 @@ class App:
         self.logo_y = -32
 
         self.start = 0
+        self.speed = 1
 
         pyxel.run(self.update, self.draw)
         
@@ -96,6 +97,10 @@ class App:
             # se
             pyxel.play(2, 10, loop=False)
 
+            if(self.score != 0 and self.score % 1000 == 0):
+                print('speed up')
+                self.speed += 0.5
+
         x -= 2
 
         if x < -40:
@@ -120,8 +125,8 @@ class App:
                 pyxel.play(2, 10, loop=False)
                 if(time.time() > self.start + 5):
                     self.item_sw = False
-
-        x += 2
+            
+        x += self.speed
 
         if x > 160:
             x = -16
@@ -294,6 +299,15 @@ class App:
         self.draw_harts()
         
     def draw_gameover(self):
+        # bgmストップ
+        pyxel.stop(0)
+        pyxel.stop(1)
+
+        # print score
+        s = "Score {:>4}".format(self.score)
+        pyxel.text(5, 4, s, 1)
+        pyxel.text(4, 4, s, 7)
+
         pyxel.text(75, 0, "game over!", 5)
     
     def update_logo(self):
